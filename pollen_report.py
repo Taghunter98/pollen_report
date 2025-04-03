@@ -13,7 +13,7 @@ proc = subprocess.Popen(["gcloud auth application-default print-access-token"], 
 output = re.sub("b'", '', str(output))
 output = str(output)[:-3]
 
-load_dotenv('/Users/joshbassett/Documents/Projects/pollen_report/.env')
+load_dotenv()
 KEY = os.getenv('KEY')
 TOKEN = f"Bearer {output}"
 latitude = 51.055002
@@ -53,6 +53,7 @@ class PollenType():
     def createHTML(self, colour):
         html =  f"""\n
             <li>
+                <span class="material-symbols-outlined"> psychiatry </span>
                 <div class="element">
                     <h3>{self.displayName}</h3>
                     <span
@@ -134,12 +135,20 @@ for item in new_arr:
 
 html_start = """
 <html>
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=psychiatry"
+  />
   <body>
     <div class="background">
       <div class="container">
-        <h1>Pollen Report</h1>
-        <p>Today's forcast</p>
-        <ul>"""
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <h1>Pollen Report</h1>
+          <p>Today's forcast for Iden Green</p>
+        </div>
+
+        <ul>
+"""
 
 html_end = """
         </ul>
@@ -165,7 +174,8 @@ html_end = """
       flex-direction: column;
       justify-content: center;
       width: auto;
-      gap: 10px;
+      height: auto;
+      gap: 25px;
       padding: 40px;
       margin: 40px;
       background-color: white;
@@ -175,15 +185,24 @@ html_end = """
     li {
       list-style: none;
       padding-bottom: 20px;
-      border-bottom: solid 1px darkgray;
+      border: solid 1px darkgray;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      padding: 20px;
     }
     .element {
       display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      padding-top: 20px;
       padding-bottom: 10px;
+    }
+
+    @media screen and (max-width: 600px) {
+      .container {
+        margin: 10px;
+        padding: 20px;
+      }
     }
   </style>
 </html>
@@ -199,7 +218,7 @@ def populate_html(array, start, end):
 html = populate_html(ordered_pollen_data, html_start, html_end)
 
 
-def sendEmail(html):
+def sendEmail(html, reciever):
         """
         Method to send an email to the client
 
@@ -210,12 +229,11 @@ def sendEmail(html):
         # Email Configuration
         EMAIL_SENDER = os.getenv('EMAIL_SENDER')
         EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
-        EMAIL_RECEIVER = os.getenv('EMAIL_RECEIVER')
         
         try:
             msg = MIMEMultipart()
-            msg['From'] = "Pollen Automation" 
-            msg['To'] = EMAIL_RECEIVER
+            msg['From'] = "Pollen Report" 
+            msg['To'] = reciever
             msg['Subject'] = "Today's pollen report for Iden Green"
 
             # Attach message body
@@ -225,10 +243,12 @@ def sendEmail(html):
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()
                 server.login(EMAIL_SENDER, EMAIL_PASSWORD)
-                server.sendmail(EMAIL_SENDER, EMAIL_RECEIVER, msg.as_string())
+                server.sendmail(EMAIL_SENDER, reciever, msg.as_string())
         
-                print("Email sent successfully!")
+                print(f"Email sent successfully to {reciever}")
         except Exception as e:
             print(f"Error: {e}")
 
-sendEmail(html)
+
+sendEmail(html, "cb@vmi.tv")
+sendEmail(html, "jb@vmi.tv")
