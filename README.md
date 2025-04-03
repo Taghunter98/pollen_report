@@ -19,5 +19,5 @@ This script first makes a call to Google's pollen API and retrieves the data thr
 Simply add the bash file to your crontab with the following command.
 
 ```
-07*** ./path/to/script/automation.sh
+0 7 * * * ./path/to/script/automation.sh
 ```

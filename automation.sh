@@ -1,3 +1,3 @@
 #!/bin/bash
-
-python3 /pollen_report.py
+source path/to/venv/bin/activate
+python3 path/to/pollen_report.py

@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 
-proc = subprocess.Popen(["gcloud auth application-default print-access-token"], stdout=subprocess.PIPE, shell=True)
+proc = subprocess.Popen(["gcloud auth print-access-token"], stdout=subprocess.PIPE, shell=True)
 (output, err) = proc.communicate()
 
 output = re.sub("b'", '', str(output))
@@ -16,11 +16,12 @@ output = str(output)[:-3]
 load_dotenv()
 KEY = os.getenv('KEY')
 TOKEN = f"Bearer {output}"
+PROJECT_ID = os.getenv('PROJECT_ID')
 latitude = 51.055002
 longitude = 0.571595
 
 headers = {
-    'X-Goog-User-Project': 'vmi-website-432609',
+    'X-Goog-User-Project': PROJECT_ID,
     'Authorization': TOKEN
 }
 
@@ -105,26 +106,26 @@ for key in pollen_types:
 new_arr = [[] for i in range(6)]
 for item in pollen_data:
     colour = item.colour()
-   
-    grey =  "rgb(247, 45, 3)"
-    dark_green = "rgb(255, 144, 0)"
-    green = "rgb(251, 255, 0)"
-    yellow = "rgb(59, 180, 81)"
-    orange = "rgb(4, 157, 60)"   
-    red = "rgb(218, 218, 218)"
+
+    grey = "rgb(218, 218, 218)"
+    dark_green = "rgb(4, 157, 60)"
+    green = "rgb(59, 180, 81)"
+    yellow = "rgb(251, 255, 0)"
+    orange = "rgb(255, 144, 0)"
+    red =  "rgb(247, 45, 3)"
 
     if colour == red:
-        new_arr[5].append(item)
-    elif colour == orange:
-        new_arr[4].append(item)
-    elif colour == yellow:
-        new_arr[3].append(item)
-    elif colour == green:
-        new_arr[2].append(item)
-    elif colour == dark_green:
-        new_arr[1].append(item)
-    elif colour == grey:
         new_arr[0].append(item)
+    elif colour == orange:
+        new_arr[1].append(item)
+    elif colour == yellow:
+        new_arr[2].append(item)
+    elif colour == green:
+        new_arr[3].append(item)
+    elif colour == dark_green:
+        new_arr[4].append(item)
+    elif colour == grey:
+        new_arr[5].append(item)
 
 ordered_pollen_data = []
 
@@ -250,5 +251,5 @@ def sendEmail(html, reciever):
             print(f"Error: {e}")
 
 
-sendEmail(html, "cb@vmi.tv")
+#sendEmail(html, "cheryl.bassett@vmi.tv")
 sendEmail(html, "jb@vmi.tv")
